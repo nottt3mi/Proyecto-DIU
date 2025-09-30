@@ -1,0 +1,78 @@
+import { Button } from "@/components/ui/button";
+import { Menu } from "lucide-react";
+import { useState } from "react";
+
+const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              ServiciosLocal
+            </h1>
+          </div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-8">
+            <a href="#servicios" className="text-foreground hover:text-primary transition-colors font-medium">
+              Servicios
+            </a>
+            <a href="#como-funciona" className="text-foreground hover:text-primary transition-colors font-medium">
+              Cómo funciona
+            </a>
+            <a href="#beneficios" className="text-foreground hover:text-primary transition-colors font-medium">
+              Beneficios
+            </a>
+          </div>
+
+          {/* Desktop CTA Buttons */}
+          <div className="hidden md:flex items-center gap-3">
+            <Button variant="ghost">
+              Iniciar sesión
+            </Button>
+            <Button variant="default">
+              Registrarse
+            </Button>
+          </div>
+
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="md:hidden p-2 rounded-md hover:bg-muted"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Mobile Navigation */}
+        {isOpen && (
+          <div className="md:hidden py-4 space-y-3 border-t">
+            <a href="#servicios" className="block py-2 text-foreground hover:text-primary transition-colors">
+              Servicios
+            </a>
+            <a href="#como-funciona" className="block py-2 text-foreground hover:text-primary transition-colors">
+              Cómo funciona
+            </a>
+            <a href="#beneficios" className="block py-2 text-foreground hover:text-primary transition-colors">
+              Beneficios
+            </a>
+            <div className="pt-4 space-y-2">
+              <Button variant="ghost" className="w-full">
+                Iniciar sesión
+              </Button>
+              <Button variant="default" className="w-full">
+                Registrarse
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;
