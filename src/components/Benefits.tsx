@@ -23,7 +23,7 @@ const workerBenefits = [
   {
     icon: ThumbsUp,
     title: "Construye tu reputación",
-    description: "Las buenas evaluaciones atraen más clientes",
+    description: "Las buenas evaluaciones atraen más clientes y potencian tu negocio",
   },
   {
     icon: Users,

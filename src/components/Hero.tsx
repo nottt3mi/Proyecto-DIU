@@ -22,10 +22,10 @@ const Hero = () => {
             <span className="text-primary font-semibold">🏠 Conectamos confianza</span>
           </div>
           
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-            Encuentra el servicio{" "}
+          <h1 className="text-5xl md:text-6xl lg:text-6xl font-bold mb-6 leading-tight">
+            Encuentra el servicio que{" "}
             <span className="bg-gradient-to-r from-primary via-primary-glow to-secondary bg-clip-text text-transparent">
-              perfecto
+              necesitas
             </span>{" "}
             para tu hogar
           </h1>
