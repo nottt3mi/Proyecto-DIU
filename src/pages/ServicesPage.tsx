@@ -1,8 +1,10 @@
+import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Services from "@/components/Services";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
-import { Leaf, Wrench, Sparkles, Paintbrush, Package, Settings } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Leaf, Wrench, Sparkles, Paintbrush, Package, Settings, Search } from "lucide-react";
 
 const services = [
   {
@@ -44,6 +46,12 @@ const services = [
 ];
 
 const ServicesPage = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredServices = services.filter((service) =>
+    service.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -58,9 +66,23 @@ const ServicesPage = () => {
                     Encuentra el profesional ideal para cualquier tarea del hogar
                   </p>
                 </div>
+
+                <div className="max-w-md mx-auto mb-8">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                    <Input
+                      type="text"
+                      placeholder="Buscar servicios por nombre..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
         
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {services.map((service, index) => {
+                  {filteredServices.length > 0 ? (
+                    filteredServices.map((service, index) => {
                     const Icon = service.icon;
                     return (
                       <Card 
@@ -85,7 +107,14 @@ const ServicesPage = () => {
                         </CardContent>
                       </Card>
                     );
-                  })}
+                  })
+                  ) : (
+                    <div className="col-span-full text-center py-12">
+                      <p className="text-muted-foreground text-lg">
+                        No se encontraron servicios que coincidan con "{searchTerm}"
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
       </main>
