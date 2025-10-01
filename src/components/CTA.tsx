@@ -14,7 +14,7 @@ const CTA = () => {
           </h2>
           <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
             Únete a nuestra comunidad de miles de personas que confían en 
-            ServiciosLocal para sus necesidades del hogar
+            Helpers para sus necesidades del hogar
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -34,16 +34,16 @@ const CTA = () => {
               <div className="text-sm text-muted-foreground">Seguro</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary mb-1">24/7</div>
-              <div className="text-sm text-muted-foreground">Soporte</div>
+              <div className="text-2xl font-bold text-primary mb-1">Soporte</div>
+              <div className="text-sm text-muted-foreground">24/7</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary mb-1">Verificado</div>
-              <div className="text-sm text-muted-foreground">Trabajadores</div>
+              <div className="text-2xl font-bold text-primary mb-1">Trabajadores</div>
+              <div className="text-sm text-muted-foreground">Verificados</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary mb-1">Gratis</div>
-              <div className="text-sm text-muted-foreground">Registro</div>
+              <div className="text-2xl font-bold text-primary mb-1">Registro</div>
+              <div className="text-sm text-muted-foreground">Gratis</div>
             </div>
           </div>
         </div>

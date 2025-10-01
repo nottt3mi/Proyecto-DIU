@@ -1,13 +1,9 @@
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-image.jpg";
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Hero = () => {
-
-  const irAServicios = () => {
-    window.location.href = "/Services";
-  };
-
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden">
       {/* Background with gradient overlay */}
@@ -39,16 +35,6 @@ const Hero = () => {
             Conectamos a personas que necesitan servicios domésticos con trabajadores 
             confiables en tu zona. Rápido, seguro y con evaluaciones verificadas.
           </p>
-
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button onClick={irAServicios} size="lg" variant="hero" className="text-lg group">
-              Buscar servicios
-              <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button size="lg" variant="secondary" className="text-lg">
-              Ofrecer mis servicios
-            </Button>
-          </div>
 
           {/* Trust indicators */}
           <div className="mt-12 flex flex-wrap gap-8 items-center">

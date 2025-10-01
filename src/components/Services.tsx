@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 import serviceGardening from "@/assets/service-gardening.jpg";
 import serviceRepairs from "@/assets/service-repairs.jpg";
 import serviceCleaning from "@/assets/service-cleaning.jpg";
@@ -90,6 +91,11 @@ const Services = () => {
                       <p className="text-muted-foreground">
                         {service.description}
                       </p>
+                      <div className="mt-4">
+                        <Link to={`/services?area=${encodeURIComponent(service.title)}`} className="text-primary hover:underline font-medium">
+                          Ver profesionales
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
