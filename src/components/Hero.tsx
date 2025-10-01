@@ -3,6 +3,11 @@ import heroImage from "@/assets/hero-image.jpg";
 import { ArrowRight } from "lucide-react";
 
 const Hero = () => {
+
+  const irAServicios = () => {
+    window.location.href = "/Services";
+  };
+
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden">
       {/* Background with gradient overlay */}
@@ -36,7 +41,7 @@ const Hero = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button size="lg" variant="hero" className="text-lg group">
+            <Button onClick={irAServicios} size="lg" variant="hero" className="text-lg group">
               Buscar servicios
               <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
