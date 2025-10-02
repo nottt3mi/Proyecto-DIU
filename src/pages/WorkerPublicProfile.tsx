@@ -1,6 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/firebase";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -9,9 +11,35 @@ import { Star, MapPin, Award, Briefcase, FileText, ArrowLeft } from "lucide-reac
 
 const WorkerPublicProfile = () => {
   const { id } = useParams();
-  const { users } = useAuth();
+  const [worker, setWorker] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const worker = useMemo(() => users.find(u => u.id === id && u.tipo === 'trabajador'), [users, id]);
+  useEffect(() => {
+    if (id) {
+      getDoc(doc(db, "users", id)).then(docSnap => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.tipo === "trabajador") {
+            setWorker(data);
+          }
+        }
+        setLoading(false);
+      }).catch((error) => {
+        console.error("Error fetching worker:", error);
+        setLoading(false);
+      });
+    } else {
+      setLoading(false);
+    }
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Cargando...
+      </div>
+    );
+  }
 
   if (!worker) {
     return (

@@ -8,7 +8,7 @@ import { ArrowLeft, User, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { AREAS, COMUNAS, TRABAJOS_POR_AREA } from "@/lib/options";
+import { AREAS, COMUNAS, COMUNAS_POR_REGION, REGIONES, TRABAJOS_POR_AREA } from "@/lib/options";
 
 const RegisterWorker = () => {
   const { toast } = useToast();
@@ -25,6 +25,7 @@ const RegisterWorker = () => {
     banco: "",
     areaTrabajo: "",
     disponibilidadHoraria: "",
+    region: "",                // <-- nuevo campo región
     zona: "",
     trabajosEspecificos: [] as string[]
   });
@@ -43,8 +44,8 @@ const RegisterWorker = () => {
     
     // Validación básica
     if (!formData.nombre || !formData.apellido || !formData.rut || 
-        !formData.direccion || !formData.correo || !formData.contraseña || 
-        !formData.banco || !formData.areaTrabajo || !formData.zona) {
+        !formData.direccion || !formData.region || !formData.zona || !formData.correo || !formData.contraseña || 
+        !formData.banco || !formData.areaTrabajo) {   // se agregó !formData.region
       toast({
         title: "Error",
         description: "Por favor completa todos los campos obligatorios",
@@ -189,6 +190,24 @@ const RegisterWorker = () => {
                   />
                 </div>
 
+                {/* Nuevo Campo: Región */}
+                <div className="space-y-2">
+                  <Label htmlFor="region">Región *</Label>
+                  <Select
+                    value={formData.region}
+                    onValueChange={(value) => handleInputChange("region", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona tu región" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {REGIONES.map((r) => (
+                        <SelectItem key={r} value={r}>{r}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 {/* Zona / Comuna */}
                 <div className="space-y-2">
                   <Label htmlFor="zona">Comuna *</Label>
@@ -200,7 +219,7 @@ const RegisterWorker = () => {
                       <SelectValue placeholder="Selecciona tu comuna" />
                     </SelectTrigger>
                     <SelectContent>
-                      {COMUNAS.map((c) => (
+                      {(formData.region && COMUNAS_POR_REGION[formData.region] ? COMUNAS_POR_REGION[formData.region] : COMUNAS).map((c) => (
                         <SelectItem key={c} value={c}>{c}</SelectItem>
                       ))}
                     </SelectContent>
