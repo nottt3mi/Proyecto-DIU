@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -41,6 +41,28 @@ const WorkerProfilePage = () => {
   const [newEspecialidad, setNewEspecialidad] = useState("");
   const [newExperiencia, setNewExperiencia] = useState("");
   const [newCertificado, setNewCertificado] = useState("");
+
+  useEffect(() => {
+  if (user) {
+    setFormData({
+      nombre: user.nombre,
+      apellido: user.apellido,
+      rut: user.rut,
+      direccion: user.direccion,
+      correo: user.correo,
+      contraseña: "",
+      zona: user.zona,
+      banco: user.banco || "",
+      biografia: user.biografia || "",
+      curriculum: user.curriculum || "",
+      especialidades: user.especialidades || [],
+      experiencias: user.experiencias || [],
+      certificados: user.certificados || [],
+      areaTrabajo: user.areaTrabajo || "",
+      disponibilidadHoraria: user.disponibilidadHoraria || ""
+    });
+  }
+}, [user]);
 
   if (!user || user.tipo !== 'trabajador') {
     return (

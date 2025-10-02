@@ -95,7 +95,7 @@ const RegisterWorker = () => {
         description: "Tu cuenta de trabajador ha sido creada y has iniciado sesión",
       });
       
-      navigate("/");
+      navigate("/profile/worker");
     } catch (error) {
       toast({
         title: "Error",
