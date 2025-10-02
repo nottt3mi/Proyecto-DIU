@@ -165,13 +165,12 @@ const ServicesExplore = () => {
                   )}
 
                   <div className="mt-4 flex justify-end">
-                    <Button asChild size="sm">
+                    <Button asChild size="sm" className="ml-5" variant="outline">
                       <Link to={`/worker/${worker.id}`}>Ver perfil</Link>
                     </Button>
-                  </div>
-                  <div className="mt-4 flex justify-end">
-                    <Button asChild size="sm">
-                      <Link to={`/worker/${worker.id}`}>Agendar visita</Link>
+
+                    <Button asChild size="sm" className="ml-5">
+                      <Link to={`/booking/${worker.id}`}>Agendar visita</Link>
                     </Button>
                   </div>
                 </CardContent>

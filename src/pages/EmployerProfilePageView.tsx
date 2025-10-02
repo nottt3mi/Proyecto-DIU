@@ -12,6 +12,8 @@ import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { COMUNAS } from "@/lib/options";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const EmployerProfilePage = () => {
   const { user, updateUser } = useAuth();
@@ -158,8 +160,8 @@ const EmployerProfilePage = () => {
             <div className="mx-auto mb-4 p-4 bg-primary/10 rounded-full w-fit">
               <Building2 className="h-12 w-12 text-primary" />
             </div>
-            <h1 className="text-4xl font-bold mb-4">Mi Perfil - Empleador</h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <h1 className="text-3xl font-bold mb-4">Mi Perfil - Empleador</h1>
+            <p className="text text-muted-foreground max-w-2xl mx-auto">
               Gestiona tu información personal y preferencias
             </p>
           </div>
@@ -421,5 +423,19 @@ const EmployerProfilePage = () => {
   );
 };
 
-export default EmployerProfilePage;
+const EmployerProfilePageView = () => {
+  return (
+    <div className="min-h-screen">
+      <Navbar />
+      <main>
+        <EmployerProfilePage />
+        
+      </main>
+      <Footer />
+    </div>
+  );
+
+}
+
+export default EmployerProfilePageView;
 

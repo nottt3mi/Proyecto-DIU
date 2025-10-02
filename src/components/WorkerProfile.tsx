@@ -35,6 +35,7 @@ const WorkerProfile = () => {
     <div className="flex items-center gap-4">
       {/* Avatar y nombre */}
       <div className="flex items-center gap-3">
+      <button className="flex items-center gap-3" onClick={handleEditProfile}>
         <Avatar className="h-10 w-10">
           <AvatarImage src={user.foto} alt={`${user.nombre} ${user.apellido}`} />
           <AvatarFallback>{initials}</AvatarFallback>
@@ -46,64 +47,18 @@ const WorkerProfile = () => {
             {user.zona}
           </div>
         </div>
-      </div>
-
-      {/* Información del perfil */}
-      <div className="hidden lg:flex items-center gap-4">
-        {/* Calificaciones */}
-        <div className="flex items-center gap-1">
-          <Star className="h-4 w-4 text-yellow-500 fill-current" />
-          <span className="text-sm font-medium">{user.calificaciones}</span>
-          <span className="text-xs text-muted-foreground">({user.reseñas})</span>
-        </div>
-
-        {/* Especialidades */}
-        {user.especialidades && user.especialidades.length > 0 && (
-          <div className="flex items-center gap-1">
-            <Briefcase className="h-4 w-4 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">
-              {user.especialidades.slice(0, 2).join(", ")}
-              {user.especialidades.length > 2 && "..."}
-            </span>
-          </div>
-        )}
-
-        {/* Certificados */}
-        {user.certificados && user.certificados.length > 0 && (
-          <div className="flex items-center gap-1">
-            <Award className="h-4 w-4 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">
-              {user.certificados.length} certificado{user.certificados.length > 1 ? 's' : ''}
-            </span>
-          </div>
-        )}
-
-        {/* Badge de tipo */}
-        <Badge variant="secondary" className="text-xs">
-          Trabajador
-        </Badge>
-      </div>
-
+      </button>
       {/* Botones de acción */}
       <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleEditProfile}
-          className="hidden md:flex"
-        >
-          <Edit className="h-4 w-4 mr-1" />
-          Editar
-        </Button>
         <Button
           variant="ghost"
           size="sm"
           onClick={handleLogout}
         >
           <LogOut className="h-4 w-4" />
-          <span className="hidden md:inline ml-1">Cerrar Sesión</span>
         </Button>
       </div>
+    </div>
     </div>
   );
 };

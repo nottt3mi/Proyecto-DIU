@@ -12,6 +12,8 @@ import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { AREAS, COMUNAS, TRABAJOS_POR_AREA } from "@/lib/options";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const WorkerProfilePage = () => {
   const { user, updateUser } = useAuth();
@@ -758,5 +760,19 @@ const WorkerProfilePage = () => {
   );
 };
 
-export default WorkerProfilePage;
+const WorkerProfilePageView = () => {
+  return (
+    <div className="min-h-screen">
+      <Navbar />
+      <main>
+        <WorkerProfilePage />
+        
+      </main>
+      <Footer />
+    </div>
+  );
+
+}
+
+export default WorkerProfilePageView;
 

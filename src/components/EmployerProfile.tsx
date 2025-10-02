@@ -33,6 +33,7 @@ const EmployerProfile = () => {
 
   return (
     <div className="flex items-center gap-4">
+    <button  onClick={handleEditProfile}>
       {/* Avatar y nombre */}
       <div className="flex items-center gap-3">
         <Avatar className="h-10 w-10">
@@ -48,39 +49,15 @@ const EmployerProfile = () => {
         </div>
       </div>
 
-      {/* Información del perfil */}
-      <div className="hidden lg:flex items-center gap-4">
-        {/* Calificaciones */}
-        <div className="flex items-center gap-1">
-          <Star className="h-4 w-4 text-yellow-500 fill-current" />
-          <span className="text-sm font-medium">{user.calificaciones}</span>
-          <span className="text-xs text-muted-foreground">({user.reseñas})</span>
-        </div>
-
-        {/* Badge de tipo */}
-        <Badge variant="secondary" className="text-xs">
-          Empleador
-        </Badge>
-      </div>
-
-      {/* Botones de acción */}
+    </button>
+    {/* Botones de acción */}
       <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleEditProfile}
-          className="hidden md:flex"
-        >
-          <Edit className="h-4 w-4 mr-1" />
-          Editar
-        </Button>
         <Button
           variant="ghost"
           size="sm"
           onClick={handleLogout}
         >
           <LogOut className="h-4 w-4" />
-          <span className="hidden md:inline ml-1">Cerrar Sesión</span>
         </Button>
       </div>
     </div>

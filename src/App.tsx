@@ -11,13 +11,13 @@ import RegisterWorker from "./pages/RegisterWorker";
 import LoginType from "./pages/LoginType";
 import LoginEmployer from "./pages/LoginEmployer";
 import LoginWorker from "./pages/LoginWorker";
-import EmployerProfilePage from "./pages/EmployerProfilePage";
-import WorkerProfilePage from "./pages/WorkerProfilePage";
+import EmployerProfilePage from "./pages/EmployerProfilePageView";
+import WorkerProfilePageView from "./pages/WorkerProfilePageView";
 import { AuthProvider } from "./contexts/AuthContext";
 import ServicesExplore from "./components/ServicesExplore";
 import WorkerPublicProfileView from "./pages/WorkerPublicProfileView";
 import SelectService from "./pages/SelectService";
-
+import BookingPage from "./components/Booking";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -30,6 +30,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/services" element={<SelectService />} />
+            <Route path="/booking/:id" element={<BookingPage />} />
             <Route path="/worker/:id" element={<WorkerPublicProfileView />} />
             <Route path="/register" element={<RegisterType />} />
             <Route path="/register/employer" element={<RegisterEmployer />} />
@@ -38,7 +39,7 @@ const App = () => (
             <Route path="/login/employer" element={<LoginEmployer />} />
             <Route path="/login/worker" element={<LoginWorker />} />
             <Route path="/profile/employer" element={<EmployerProfilePage />} />
-            <Route path="/profile/worker" element={<WorkerProfilePage />} />
+            <Route path="/profile/worker" element={<WorkerProfilePageView />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
