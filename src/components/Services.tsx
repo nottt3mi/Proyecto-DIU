@@ -1,9 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Link } from "react-router-dom";
 import serviceGardening from "@/assets/service-gardening.jpg";
 import serviceRepairs from "@/assets/service-repairs.jpg";
 import serviceCleaning from "@/assets/service-cleaning.jpg";
 import { Leaf, Wrench, Sparkles, Paintbrush, Package, Settings } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const services = [
   {
@@ -48,6 +48,7 @@ const services = [
 ];
 
 const Services = () => {
+  const navigate = useNavigate();
   return (
     <section className="py-20 bg-muted/30">
       <div className="container mx-auto px-4">
@@ -64,7 +65,7 @@ const Services = () => {
           {services.map((service, index) => {
             const Icon = service.icon;
             return (
-              <Card 
+              <Card onClick={ () => navigate(`/services?area=${encodeURIComponent(service.title)}`) }
                 key={index} 
                 className="group hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer border-2 hover:border-primary/50"
               >
@@ -91,11 +92,6 @@ const Services = () => {
                       <p className="text-muted-foreground">
                         {service.description}
                       </p>
-                      <div className="mt-4">
-                        <Link to={`/services?area=${encodeURIComponent(service.title)}`} className="text-primary hover:underline font-medium">
-                          Ver profesionales
-                        </Link>
-                      </div>
                     </div>
                   </div>
                 </CardContent>

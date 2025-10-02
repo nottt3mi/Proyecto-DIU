@@ -10,28 +10,54 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { isAuthenticated, user } = useAuth();
 
+  const scrollToSection = (id: string) => {
+    if (!id) {
+      // Si no se pasa id, ir al top
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      } else {
+        // Si la sección no existe en esta página, redirige a home con hash
+        window.location.href = `/#${id}`;
+      }
+    }
+    setIsOpen(false); // Cierra el menú móvil al hacer click
+  };
+
+
   return (
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <button onClick={() => scrollToSection("")} className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Helpers
-            </h1>
+            </button>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <a href="#servicios" className="text-foreground hover:text-primary transition-colors font-medium">
+            <button
+              onClick={() => scrollToSection("servicios")}
+              className="text-foreground hover:text-primary transition-colors font-medium"
+            >
               Servicios
-            </a>
-            <a href="#como-funciona" className="text-foreground hover:text-primary transition-colors font-medium">
+            </button>
+            <button
+              onClick={() => scrollToSection("como-funciona")}
+              className="text-foreground hover:text-primary transition-colors font-medium"
+            >
               Cómo funciona
-            </a>
-            <a href="#beneficios" className="text-foreground hover:text-primary transition-colors font-medium">
+            </button>
+            <button
+              onClick={() => scrollToSection("beneficios")}
+              className="text-foreground hover:text-primary transition-colors font-medium"
+            >
               Beneficios
-            </a>
+            </button>
           </div>
 
           {/* Desktop CTA Buttons */}
@@ -62,15 +88,24 @@ const Navbar = () => {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden py-4 space-y-3 border-t">
-            <a href="#servicios" className="block py-2 text-foreground hover:text-primary transition-colors">
+            <button
+              onClick={() => scrollToSection("servicios")}
+              className="block py-2 text-foreground hover:text-primary transition-colors w-full text-left"
+            >
               Servicios
-            </a>
-            <a href="#como-funciona" className="block py-2 text-foreground hover:text-primary transition-colors">
+            </button>
+            <button
+              onClick={() => scrollToSection("como-funciona")}
+              className="block py-2 text-foreground hover:text-primary transition-colors w-full text-left"
+            >
               Cómo funciona
-            </a>
-            <a href="#beneficios" className="block py-2 text-foreground hover:text-primary transition-colors">
+            </button>
+            <button
+              onClick={() => scrollToSection("beneficios")}
+              className="block py-2 text-foreground hover:text-primary transition-colors w-full text-left"
+            >
               Beneficios
-            </a>
+            </button>
             <div className="pt-4 space-y-2">
               {isAuthenticated ? (
                 user?.tipo === 'empleador' ? <EmployerProfile /> : <WorkerProfile />

@@ -1,4 +1,13 @@
+// src/context/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  onAuthStateChanged, 
+  signOut 
+} from "firebase/auth";
+import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
+import { auth, db } from "../firebase";
 
 export interface User {
   id: string;
@@ -22,19 +31,16 @@ export interface User {
   experiencias?: string[];
   certificados?: string[];
   banco?: string;
-  // Nuevos campos para trabajador
-  areaTrabajo?: string; // Jardinería, Reparaciones, Limpieza, etc.
-  disponibilidadHoraria?: string; // Texto libre o rango
+  areaTrabajo?: string;
+  disponibilidadHoraria?: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  users: User[];
-  login: (userData: User) => void;
-  logout: () => void;
-  register: (userData: Omit<User, 'id' | 'calificaciones' | 'reseñas' | 'foto'>) => User;
-  verifyCredentials: (correo: string, contraseña: string, tipo: 'empleador' | 'trabajador') => User | null;
-  updateUser: (userId: string, updates: Partial<User>) => void;
+  register: (userData: Omit<User, 'id' | 'calificaciones' | 'reseñas' | 'foto'>) => Promise<User>;
+  login: (correo: string, contraseña: string) => Promise<User>;
+  logout: () => Promise<void>;
+  updateUser: (userId: string, updates: Partial<User>) => Promise<void>;
   isAuthenticated: boolean;
 }
 
@@ -54,105 +60,85 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
 
+  // Escucha cambios de sesión de Firebase
   useEffect(() => {
-    // Cargar usuarios desde localStorage
-    const savedUsers = localStorage.getItem('users');
-    if (savedUsers) {
-      try {
-        setUsers(JSON.parse(savedUsers));
-      } catch (error) {
-        console.error('Error parsing saved users data:', error);
-        localStorage.removeItem('users');
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
+        if (userDoc.exists()) {
+          setUser(userDoc.data() as User);
+        }
+      } else {
+        setUser(null);
       }
-    }
+    });
 
-    // Cargar usuario actual desde localStorage
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (error) {
-        console.error('Error parsing saved user data:', error);
-        localStorage.removeItem('currentUser');
-      }
-    }
+    return () => unsubscribe();
   }, []);
 
-  const generateId = () => {
-    return Date.now().toString() + Math.random().toString(36).substr(2, 9);
-  };
+  // Registro
+  const register = async (userData: Omit<User, 'id' | 'calificaciones' | 'reseñas' | 'foto'>): Promise<User> => {
+    // Crear usuario en Firebase Auth
+    const userCredential = await createUserWithEmailAndPassword(auth, userData.correo, userData.contraseña);
+    const uid = userCredential.user.uid;
 
-  const register = (userData: Omit<User, 'id' | 'calificaciones' | 'reseñas' | 'foto'>): User => {
     const newUser: User = {
       ...userData,
-      id: generateId(),
+      id: uid,
       calificaciones: 0,
       reseñas: 0,
       foto: '/placeholder.svg',
       biografia: '',
-      // Defaults para trabajador
       especialidades: userData.especialidades ?? [],
       experiencias: userData.experiencias ?? [],
       certificados: userData.certificados ?? [],
     };
 
-    const updatedUsers = [...users, newUser];
-    setUsers(updatedUsers);
-    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    // Guardar en Firestore
+    await setDoc(doc(db, "users", uid), newUser);
+    setUser(newUser);
 
     return newUser;
   };
 
-  const verifyCredentials = (correo: string, contraseña: string, tipo: 'empleador' | 'trabajador'): User | null => {
-    const foundUser = users.find(u => 
-      u.correo === correo && 
-      u.contraseña === contraseña && 
-      u.tipo === tipo
-    );
-    return foundUser || null;
+  // Login
+  const login = async (correo: string, contraseña: string): Promise<User> => {
+    const userCredential = await signInWithEmailAndPassword(auth, correo, contraseña);
+    const uid = userCredential.user.uid;
+
+    const userDoc = await getDoc(doc(db, "users", uid));
+    if (!userDoc.exists()) throw new Error("Usuario no encontrado");
+
+    const loggedUser = userDoc.data() as User;
+    setUser(loggedUser);
+    return loggedUser;
   };
 
-  const login = (userData: User) => {
-    setUser(userData);
-    localStorage.setItem('currentUser', JSON.stringify(userData));
-  };
-
-  const logout = () => {
+  // Logout
+  const logout = async () => {
+    await signOut(auth);
     setUser(null);
-    localStorage.removeItem('currentUser');
   };
 
-  const updateUser = (userId: string, updates: Partial<User>) => {
-    const updatedUsers = users.map(u => 
-      u.id === userId ? { ...u, ...updates } : u
-    );
-    setUsers(updatedUsers);
-    localStorage.setItem('users', JSON.stringify(updatedUsers));
+  // Actualizar usuario
+  const updateUser = async (userId: string, updates: Partial<User>) => {
+    const userRef = doc(db, "users", userId);
+    await updateDoc(userRef, updates);
 
-    // Si es el usuario actual, actualizar también el estado
     if (user && user.id === userId) {
-      const updatedUser = { ...user, ...updates };
-      setUser(updatedUser);
-      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      setUser({ ...user, ...updates });
     }
   };
 
   const value: AuthContextType = {
     user,
-    users,
+    register,
     login,
     logout,
-    register,
-    verifyCredentials,
     updateUser,
     isAuthenticated: !!user,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
