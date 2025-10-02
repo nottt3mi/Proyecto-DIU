@@ -15,7 +15,7 @@ import EmployerProfilePage from "./pages/EmployerProfilePage";
 import WorkerProfilePage from "./pages/WorkerProfilePage";
 import { AuthProvider } from "./contexts/AuthContext";
 import ServicesExplore from "./components/ServicesExplore";
-import WorkerPublicProfile from "./pages/WorkerPublicProfile";
+import WorkerPublicProfileView from "./pages/WorkerPublicProfileView";
 import SelectService from "./pages/SelectService";
 
 const queryClient = new QueryClient();
@@ -30,7 +30,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/services" element={<SelectService />} />
-            <Route path="/worker/:id" element={<WorkerPublicProfile />} />
+            <Route path="/worker/:id" element={<WorkerPublicProfileView />} />
             <Route path="/register" element={<RegisterType />} />
             <Route path="/register/employer" element={<RegisterEmployer />} />
             <Route path="/register/worker" element={<RegisterWorker />} />

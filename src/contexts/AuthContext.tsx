@@ -6,7 +6,7 @@ import {
   onAuthStateChanged, 
   signOut 
 } from "firebase/auth";
-import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc, collection, addDoc, getDocs } from "firebase/firestore";
 import { auth, db } from "../firebase";
 
 export interface User {
@@ -141,4 +141,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+
+export const addReview = async (workerId: string, autorId: string, estrellas: number, comentario: string) => {
+  const reviewsRef = collection(db, "users", workerId, "reviews");
+
+  await addDoc(reviewsRef, {
+    autorId,
+    estrellas,
+    comentario,
+    fecha: new Date()
+  });
+
+  // Recalcular promedio de calificaciones
+  const snapshot = await getDocs(reviewsRef);
+  let total = 0;
+  snapshot.forEach(doc => {
+    total += doc.data().estrellas;
+  });
+
+  const promedio = total / snapshot.size;
+
+  await updateDoc(doc(db, "users", workerId), {
+    calificaciones: promedio,
+    reseñas: snapshot.size
+  });
 };

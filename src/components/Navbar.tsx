@@ -11,20 +11,22 @@ const Navbar = () => {
   const { isAuthenticated, user } = useAuth();
 
   const scrollToSection = (id: string) => {
+    if (window.location.pathname !== "/") {
+      // Si no estamos en home, redirige a home con hash
+      window.location.href = id ? `/#${id}` : "/";
+      return; // Salimos, el scroll se hará cuando cargue la página
+    }
+
+    // Si estamos en home, hacemos scroll
     if (!id) {
-      // Si no se pasa id, ir al top
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       const element = document.getElementById(id);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
-      } else {
-        // Si la sección no existe en esta página, redirige a home con hash
-        window.location.href = `/#${id}`;
-      }
-    }
-    setIsOpen(false); // Cierra el menú móvil al hacer click
-  };
+      element?.scrollIntoView({ behavior: "smooth" });
+  }
+
+  setIsOpen(false); // Cierra menú móvil
+};
 
 
   return (

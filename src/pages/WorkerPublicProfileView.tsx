@@ -1,36 +1,130 @@
-import { useMemo, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/firebase";
+import { doc, getDoc, collection, addDoc, getDocs, updateDoc } from "firebase/firestore";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, MapPin, Award, Briefcase, FileText, ArrowLeft } from "lucide-react";
+import { Star, MapPin, ArrowLeft } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+
+// ---- Formulario de reseña ----
+const ReviewForm = ({ workerId, onNewReview }) => {
+  const { user } = useAuth();
+  const [estrellas, setEstrellas] = useState(5);
+  const [comentario, setComentario] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!user) return alert("Debes iniciar sesión para dejar una reseña.");
+
+    setIsSubmitting(true);
+    try {
+      const reviewsRef = collection(db, "users", workerId, "reviews");
+
+      // Guardar nueva reseña
+      await addDoc(reviewsRef, {
+        autorId: user.id,
+        estrellas,
+        comentario,
+        fecha: new Date()
+      });
+
+      // Recalcular promedio y cantidad
+      const snap = await getDocs(reviewsRef);
+      let total = 0;
+      snap.forEach(d => total += d.data().estrellas);
+      const promedio = total / snap.size;
+
+      await updateDoc(doc(db, "users", workerId), {
+        calificaciones: promedio,
+        reseñas: snap.size
+      });
+
+      setComentario("");
+      setEstrellas(5);
+
+      if (onNewReview) onNewReview();
+    } catch (error) {
+      console.error("Error guardando reseña:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+      <div>
+        <label className="block text-sm font-medium">Calificación (1-5)</label>
+        <input
+          type="number"
+          min="1"
+          max="5"
+          value={estrellas}
+          onChange={(e) => setEstrellas(Number(e.target.value))}
+          className="border rounded px-2 py-1 w-20"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium">Comentario</label>
+        <textarea
+          value={comentario}
+          onChange={(e) => setComentario(e.target.value)}
+          className="border rounded px-3 py-2 w-full"
+          placeholder="Escribe tu reseña..."
+        />
+      </div>
+      <Button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "Enviando..." : "Enviar Reseña"}
+      </Button>
+    </form>
+  );
+};
 
 const WorkerPublicProfile = () => {
   const { id } = useParams();
   const [worker, setWorker] = useState(null);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (id) {
-      getDoc(doc(db, "users", id)).then(docSnap => {
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          if (data.tipo === "trabajador") {
-            setWorker(data);
-          }
+  const fetchWorker = async () => {
+    if (!id) return;
+    try {
+      const docSnap = await getDoc(doc(db, "users", id));
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.tipo === "trabajador") {
+          setWorker(data);
         }
-        setLoading(false);
-      }).catch((error) => {
-        console.error("Error fetching worker:", error);
-        setLoading(false);
-      });
-    } else {
-      setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error fetching worker:", error);
     }
+  };
+
+  const fetchReviews = async () => {
+    if (!id) return;
+    try {
+      const snap = await getDocs(collection(db, "users", id, "reviews"));
+      const revs = snap.docs.map((d) => d.data());
+      setReviews(revs);
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    }
+  };
+
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      await fetchWorker();
+      await fetchReviews();
+      setLoading(false);
+    };
+    load();
   }, [id]);
 
   if (loading) {
@@ -68,6 +162,7 @@ const WorkerPublicProfile = () => {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
+          {/* --- Perfil principal --- */}
           <Card className="lg:col-span-1">
             <CardHeader className="text-center">
               <Avatar className="h-24 w-24 mx-auto mb-4">
@@ -79,7 +174,7 @@ const WorkerPublicProfile = () => {
                 <div className="flex items-center justify-center gap-1">
                   <Star className="h-4 w-4 text-yellow-500 fill-current" />
                   <span className="font-medium">{worker.calificaciones?.toFixed(1) || 0}</span>
-                  <span className="text-muted-foreground">({worker.reseñas} reseñas)</span>
+                  <span className="text-muted-foreground">({worker.reseñas || 0} reseñas)</span>
                 </div>
               </CardDescription>
             </CardHeader>
@@ -98,6 +193,7 @@ const WorkerPublicProfile = () => {
             </CardContent>
           </Card>
 
+          {/* --- Información adicional --- */}
           <div className="lg:col-span-2 space-y-6">
             <Card>
               <CardHeader>
@@ -113,7 +209,7 @@ const WorkerPublicProfile = () => {
                 <CardTitle>Especialidades</CardTitle>
               </CardHeader>
               <CardContent>
-                {worker.especialidades && worker.especialidades.length > 0 ? (
+                {worker.especialidades?.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {worker.especialidades.map((e, i) => (
                       <Badge key={i} variant="outline">{e}</Badge>
@@ -130,7 +226,7 @@ const WorkerPublicProfile = () => {
                 <CardTitle>Experiencia</CardTitle>
               </CardHeader>
               <CardContent>
-                {worker.experiencias && worker.experiencias.length > 0 ? (
+                {worker.experiencias?.length > 0 ? (
                   <ul className="list-disc pl-5 space-y-1 text-sm">
                     {worker.experiencias.map((exp, i) => (
                       <li key={i}>{exp}</li>
@@ -147,7 +243,7 @@ const WorkerPublicProfile = () => {
                 <CardTitle>Certificados</CardTitle>
               </CardHeader>
               <CardContent>
-                {worker.certificados && worker.certificados.length > 0 ? (
+                {worker.certificados?.length > 0 ? (
                   <ul className="list-disc pl-5 space-y-1 text-sm">
                     {worker.certificados.map((c, i) => (
                       <li key={i}>{c}</li>
@@ -158,6 +254,31 @@ const WorkerPublicProfile = () => {
                 )}
               </CardContent>
             </Card>
+
+            {/* --- Reseñas --- */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Reseñas</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {reviews.length > 0 ? (
+                  reviews.map((r, i) => (
+                    <div key={i} className="border-b py-2">
+                      <p className="font-medium">⭐ {r.estrellas}</p>
+                      <p className="text-sm">{r.comentario}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {r.fecha?.seconds ? new Date(r.fecha.seconds * 1000).toLocaleDateString() : ""}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground">Sin reseñas aún.</p>
+                )}
+
+                {/* Formulario de reseña */}
+                <ReviewForm workerId={id} onNewReview={fetchReviews} />
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
@@ -165,4 +286,17 @@ const WorkerPublicProfile = () => {
   );
 };
 
-export default WorkerPublicProfile;
+const WorkerPublicProfileView = () => {
+  return (
+    <div className="min-h-screen">
+      <Navbar />
+      <main>
+        <WorkerPublicProfile />
+        
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
+export default WorkerPublicProfileView;
