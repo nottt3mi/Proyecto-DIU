@@ -165,11 +165,11 @@ const ServicesExplore = () => {
                   )}
 
                   <div className="mt-4 flex justify-end">
-                    <Button asChild size="sm" className="ml-5" variant="outline">
+                    <Button asChild size="sm" className="ml-5" variant="outline" onClick={(e) => e.stopPropagation()}>
                       <Link to={`/worker/${worker.id}`}>Ver perfil</Link>
                     </Button>
 
-                    <Button asChild size="sm" className="ml-5">
+                    <Button asChild size="sm" className="ml-5" onClick={(e) => e.stopPropagation()} >
                       <Link to={`/booking/${worker.id}`}>Agendar visita</Link>
                     </Button>
                   </div>
