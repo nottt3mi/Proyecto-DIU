@@ -65,39 +65,43 @@ const Booking = () => {
     <div className="max-w-md mx-auto mt-8 mb-8">
       <h2 className="text-2xl font-bold mb-4">Agendar visita</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <Label htmlFor="fecha">Fecha</Label>
-          <Input
-            id="fecha"
-            type="date"
-            value={formData.fecha}
-            onChange={(e) => handleChange("fecha", e.target.value)}
-            required
-          />
-        </div>
+        {/*<div  className="size-min">*/}
+        <div  className="grid grid-cols-3 gap-4">
+          <div>
+            <Label htmlFor="fecha">Fecha</Label>
+            <Input
+              id="fecha"
+              type="date"
+              value={formData.fecha}
+              onChange={(e) => handleChange("fecha", e.target.value)}
+              required
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="horaInicio">Hora Inicio</Label>
+            <Input
+              id="horaInicio"
+              type="time"
+              value={formData.horaInicio}
+              onChange={(e) => handleChange("horaInicio", e.target.value)}
+              required
+            />
+          </div>
+          
 
-        <div>
-          <Label htmlFor="horaInicio">Hora Inicio</Label>
-          <Input
-            id="horaInicio"
-            type="time"
-            value={formData.horaInicio}
-            onChange={(e) => handleChange("horaInicio", e.target.value)}
-            required
-          />
+          <div>
+            <Label htmlFor="horaFin">Hora Fin</Label>
+            <Input
+              id="horaFin"
+              type="time"
+              value={formData.horaFin}
+              onChange={(e) => handleChange("horaFin", e.target.value)}
+              required
+            />
+          </div>
         </div>
-
-        <div>
-          <Label htmlFor="horaFin">Hora Fin</Label>
-          <Input
-            id="horaFin"
-            type="time"
-            value={formData.horaFin}
-            onChange={(e) => handleChange("horaFin", e.target.value)}
-            required
-          />
-        </div>
-
+        
         <div>
           <Label htmlFor="direccion">Dirección</Label>
           <Input

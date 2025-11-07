@@ -8,7 +8,7 @@ import { ArrowLeft, Building2, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { COMUNAS } from "@/lib/options";
+import { COMUNAS, REGIONES } from "@/lib/options";
 
 const RegisterEmployer = () => {
   const { toast } = useToast();
@@ -23,7 +23,8 @@ const RegisterEmployer = () => {
     correo: "",
     contraseña: "",
     metodoPago: "",
-    zona: ""
+    zona: "",
+    region: ""
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -129,7 +130,7 @@ const RegisterEmployer = () => {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Nombre y Apellido */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="nombre">Nombre *</Label>
                     <Input
@@ -152,19 +153,58 @@ const RegisterEmployer = () => {
                       required
                     />
                   </div>
+                
+
+                  {/* RUT */}
+                  <div className="space-y-2">
+                    <Label htmlFor="rut">RUT *</Label>
+                    <Input
+                      id="rut"
+                      type="text"
+                      placeholder="12.345.678-9"
+                      value={formData.rut}
+                      onChange={(e) => handleInputChange("rut", e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
 
-                {/* RUT */}
-                <div className="space-y-2">
-                  <Label htmlFor="rut">RUT *</Label>
-                  <Input
-                    id="rut"
-                    type="text"
-                    placeholder="12.345.678-9"
-                    value={formData.rut}
-                    onChange={(e) => handleInputChange("rut", e.target.value)}
-                    required
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Región */}
+                  <div className="space-y-2">
+                    <Label htmlFor="region">Región *</Label>
+                    <Select
+                      value={formData.region}
+                      onValueChange={(value) => handleInputChange("region", value)}
+                    >                  
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona tu región" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {REGIONES.map((r) => (
+                          <SelectItem key={r} value={r}>{r}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Zona / Comuna */}
+                  <div className="space-y-2">
+                    <Label htmlFor="zona">Comuna *</Label>
+                    <Select
+                      value={(formData as any).zona || ""}
+                      onValueChange={(value) => handleInputChange("zona" as any, value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona tu comuna" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {COMUNAS.map((c) => (
+                          <SelectItem key={c} value={c}>{c}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 {/* Dirección */}
@@ -179,63 +219,47 @@ const RegisterEmployer = () => {
                     required
                   />
                 </div>
-
-                {/* Zona / Comuna */}
-                <div className="space-y-2">
-                  <Label htmlFor="zona">Comuna *</Label>
-                  <Select
-                    value={(formData as any).zona || ""}
-                    onValueChange={(value) => handleInputChange("zona" as any, value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecciona tu comuna" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {COMUNAS.map((c) => (
-                        <SelectItem key={c} value={c}>{c}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Email */}
-                <div className="space-y-2">
-                  <Label htmlFor="correo">Correo Electrónico *</Label>
-                  <Input
-                    id="correo"
-                    type="email"
-                    placeholder="tu@email.com"
-                    value={formData.correo}
-                    onChange={(e) => handleInputChange("correo", e.target.value)}
-                    required
-                  />
-                </div>
-
-                {/* Contraseña */}
-                <div className="space-y-2">
-                  <Label htmlFor="contraseña">Contraseña *</Label>
-                  <div className="relative">
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Email */}
+                  <div className="space-y-2">
+                    <Label htmlFor="correo">Correo Electrónico *</Label>
                     <Input
-                      id="contraseña"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Mínimo 8 caracteres"
-                      value={formData.contraseña}
-                      onChange={(e) => handleInputChange("contraseña", e.target.value)}
+                      id="correo"
+                      type="email"
+                      placeholder="tu@email.com"
+                      value={formData.correo}
+                      onChange={(e) => handleInputChange("correo", e.target.value)}
                       required
                     />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </Button>
+                  </div>
+
+                  {/* Contraseña */}
+                  <div className="space-y-2">
+                    <Label htmlFor="contraseña">Contraseña *</Label>
+                    <div className="relative">
+                      <Input
+                        id="contraseña"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Mínimo 8 caracteres"
+                        value={formData.contraseña}
+                        onChange={(e) => handleInputChange("contraseña", e.target.value)}
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 </div>
 
