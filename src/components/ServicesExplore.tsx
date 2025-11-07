@@ -130,7 +130,7 @@ const ServicesExplore = () => {
           {filtered.map(worker => {
             const initials = `${worker.nombre.charAt(0)}${worker.apellido.charAt(0)}`.toUpperCase();
             return (
-              <Card key={worker.id} className="border hover:shadow-md transition-shadow cursor-pointer">
+              <Card key={worker.id} className="border hover:shadow-md transition-shadow cursor-pointer" onClick={ () => window.location.href = `/worker/${worker.id}` }>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-4">
                     <Avatar className="h-12 w-12">

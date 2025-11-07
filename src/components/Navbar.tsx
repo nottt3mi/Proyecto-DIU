@@ -1,14 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import EmployerProfile from "./EmployerProfile";
 import WorkerProfile from "./WorkerProfile";
 
+
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { isAuthenticated, user } = useAuth();
+  const navigate = useNavigate();
 
   const scrollToSection = (id: string) => {
     if (window.location.pathname !== "/") {
@@ -43,7 +46,7 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             <button
-              onClick={() => scrollToSection("servicios")}
+              onClick={() => navigate(`/services`) }
               className="text-foreground hover:text-primary transition-colors font-medium"
             >
               Servicios
@@ -91,7 +94,7 @@ const Navbar = () => {
         {isOpen && (
           <div className="md:hidden py-4 space-y-3 border-t">
             <button
-              onClick={() => scrollToSection("servicios")}
+              onClick={() => navigate(`/services`) }
               className="block py-2 text-foreground hover:text-primary transition-colors w-full text-left"
             >
               Servicios
