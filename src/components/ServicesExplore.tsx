@@ -130,7 +130,7 @@ const ServicesExplore = () => {
           {filtered.map(worker => {
             const initials = `${worker.nombre.charAt(0)}${worker.apellido.charAt(0)}`.toUpperCase();
             return (
-              <Card key={worker.id} className="border hover:shadow-md transition-shadow cursor-pointer">
+              <Card key={worker.id} className="border hover:shadow-md transition-shadow cursor-pointer" onClick={ () => window.location.href = `/worker/${worker.id}` }>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-4">
                     <Avatar className="h-12 w-12">
@@ -165,11 +165,11 @@ const ServicesExplore = () => {
                   )}
 
                   <div className="mt-4 flex justify-end">
-                    <Button asChild size="sm" className="ml-5" variant="outline">
+                    <Button asChild size="sm" className="ml-5" variant="outline" onClick={(e) => e.stopPropagation()}>
                       <Link to={`/worker/${worker.id}`}>Ver perfil</Link>
                     </Button>
 
-                    <Button asChild size="sm" className="ml-5">
+                    <Button asChild size="sm" className="ml-5" onClick={(e) => e.stopPropagation()} >
                       <Link to={`/booking/${worker.id}`}>Agendar visita</Link>
                     </Button>
                   </div>

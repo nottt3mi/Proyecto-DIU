@@ -2,8 +2,10 @@ import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-image.jpg";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const navigate = useNavigate();
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden">
       {/* Background with gradient overlay */}
@@ -51,6 +53,9 @@ const Hero = () => {
               <div className="text-sm text-muted-foreground">Trabajadores activos</div>
             </div>
           </div>
+          <Button size="lg" variant="hero" className="text-lg group min-w-[200px] mt-4" onClick={ () => navigate(`/services`) }>
+              Ver servicios <ArrowRight className="inline-block ml-2 w-4 h-4" />
+            </Button>
         </div>
       </div>
     </section>
