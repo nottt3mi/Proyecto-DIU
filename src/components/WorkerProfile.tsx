@@ -33,6 +33,9 @@ const WorkerProfile = () => {
 
   return (
     <div className="flex items-center gap-4">
+      <Button className="mr-4" variant="secondary" onClick={() => window.location.href = '/reservas'}>
+        Agenda
+      </Button>
       {/* Avatar y nombre */}
       <div className="flex items-center gap-3">
       <button className="flex items-center gap-3" onClick={handleEditProfile}>

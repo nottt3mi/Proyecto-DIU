@@ -18,6 +18,7 @@ const Booking = () => {
     horaFin: "",
     direccion: "",
     infoAdicional: "",
+    estado: "pendiente de aceptación"
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -49,10 +50,11 @@ const Booking = () => {
         direccion: formData.direccion,
         infoAdicional: formData.infoAdicional,
         creadoEn: serverTimestamp(),
+        estado: formData.estado
       });
 
       toast({ title: "Agendado", description: "La visita ha sido registrada" });
-      setFormData({ fecha: "", horaInicio: "", horaFin: "", direccion: "", infoAdicional: "" });
+      setFormData({ fecha: "", horaInicio: "", horaFin: "", direccion: "", infoAdicional: "" , estado: "pendiente de aceptación"});
     } catch (error) {
       toast({ title: "Error", description: "No se pudo agendar la visita", variant: "destructive" });
       console.error(error);

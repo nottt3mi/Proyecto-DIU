@@ -19,6 +19,7 @@ import WorkerPublicProfileView from "./pages/WorkerPublicProfileView";
 import SelectService from "./pages/SelectService";
 import BookingPage from "./components/Booking";
 const queryClient = new QueryClient();
+import Reservas from "./pages/Reservas";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/login/worker" element={<LoginWorker />} />
             <Route path="/profile/employer" element={<EmployerProfilePage />} />
             <Route path="/profile/worker" element={<WorkerProfilePageView />} />
+            <Route path="/reservas" element={<Reservas />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

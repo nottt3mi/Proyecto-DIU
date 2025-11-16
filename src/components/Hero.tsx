@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-image.jpg";
 import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+
 import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
