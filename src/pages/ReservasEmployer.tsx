@@ -4,13 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { collection, getDocs, query, where, doc, updateDoc, getDoc } from "firebase/firestore";
+import { collection, getDocs, query, where, doc, getDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@/contexts/AuthContext";
-import { Calendar, Clock, MapPin, User as UserIcon, CheckCircle2, XCircle, ExternalLink } from "lucide-react";
+import { Calendar, Clock, MapPin, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface Booking {
@@ -26,23 +26,22 @@ interface Booking {
   creadoEn?: any;
 }
 
-const VistaAgenda = () => {
+const VistaAgendaEmployer = () => {
   const { isAuthenticated, user } = useAuth();
   const { toast } = useToast();
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [employers, setEmployers] = useState<Record<string, User>>({});
+  const [workers, setWorkers] = useState<Record<string, User>>({});
   const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isAuthenticated || !user?.id || user.tipo !== 'trabajador') {
+    if (!isAuthenticated || !user?.id || user.tipo !== 'empleador') {
       setLoading(false);
       return;
     }
 
     const fetchReservations = async () => {
       try {
-        const q = query(collection(db, "bookings"), where("trabajadorId", "==", user.id));
+        const q = query(collection(db, "bookings"), where("empleadorId", "==", user.id));
         const snapshot = await getDocs(q);
         const data = snapshot.docs.map(doc => ({
           id: doc.id,
@@ -51,28 +50,28 @@ const VistaAgenda = () => {
         
         setBookings(data);
 
-        // Obtener información de los empleadores
-        const employerIds = [...new Set(data.map(b => b.empleadorId).filter(Boolean))];
-        console.log("IDs de empleadores encontrados:", employerIds);
-        const employerData: Record<string, User> = {};
+        // Obtener información de los trabajadores
+        const workerIds = [...new Set(data.map(b => b.trabajadorId).filter(Boolean))];
+        console.log("IDs de trabajadores encontrados:", workerIds);
+        const workerData: Record<string, User> = {};
         
-        for (const employerId of employerIds) {
+        for (const workerId of workerIds) {
           try {
-            const employerDoc = await getDoc(doc(db, "users", employerId));
-            if (employerDoc.exists()) {
-              const employerInfo = employerDoc.data() as User;
-              employerData[employerId] = employerInfo;
-              console.log(`Empleador cargado: ${employerInfo.nombre} ${employerInfo.apellido} (${employerId})`);
+            const workerDoc = await getDoc(doc(db, "users", workerId));
+            if (workerDoc.exists()) {
+              const workerInfo = workerDoc.data() as User;
+              workerData[workerId] = workerInfo;
+              console.log(`Trabajador cargado: ${workerInfo.nombre} ${workerInfo.apellido} (${workerId})`);
             } else {
-              console.warn(`Empleador no encontrado en Firestore: ${employerId}`);
+              console.warn(`Trabajador no encontrado en Firestore: ${workerId}`);
             }
           } catch (error) {
-            console.error(`Error al obtener empleador ${employerId}:`, error);
+            console.error(`Error al obtener trabajador ${workerId}:`, error);
           }
         }
         
-        console.log("Empleadores cargados:", Object.keys(employerData).length);
-        setEmployers(employerData);
+        console.log("Trabajadores cargados:", Object.keys(workerData).length);
+        setWorkers(workerData);
       } catch (error) {
         console.error("Error al obtener reservas:", error);
         toast({
@@ -88,68 +87,12 @@ const VistaAgenda = () => {
     fetchReservations();
   }, [isAuthenticated, user?.id]);
 
-  const handleAccept = async (bookingId: string) => {
-    setUpdating(bookingId);
-    try {
-      const bookingRef = doc(db, "bookings", bookingId);
-      await updateDoc(bookingRef, {
-        estado: "aceptada"
-      });
-
-      setBookings(prev => prev.map(b => 
-        b.id === bookingId ? { ...b, estado: "aceptada" } : b
-      ));
-
-      toast({
-        title: "Solicitud aceptada",
-        description: "La solicitud ha sido aceptada correctamente",
-      });
-    } catch (error) {
-      console.error("Error al aceptar solicitud:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo aceptar la solicitud",
-        variant: "destructive"
-      });
-    } finally {
-      setUpdating(null);
-    }
-  };
-
-  const handleReject = async (bookingId: string) => {
-    setUpdating(bookingId);
-    try {
-      const bookingRef = doc(db, "bookings", bookingId);
-      await updateDoc(bookingRef, {
-        estado: "rechazada"
-      });
-
-      setBookings(prev => prev.map(b => 
-        b.id === bookingId ? { ...b, estado: "rechazada" } : b
-      ));
-
-      toast({
-        title: "Solicitud rechazada",
-        description: "La solicitud ha sido rechazada",
-      });
-    } catch (error) {
-      console.error("Error al rechazar solicitud:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo rechazar la solicitud",
-        variant: "destructive"
-      });
-    } finally {
-      setUpdating(null);
-    }
-  };
-
-  // Separar solicitudes pendientes y aceptadas
+  // Separar solicitudes pendientes y confirmadas
   const pendingRequests = useMemo(() => {
     return bookings.filter(b => b.estado === "pendiente de aceptación");
   }, [bookings]);
 
-  const acceptedRequests = useMemo(() => {
+  const confirmedRequests = useMemo(() => {
     return bookings
       .filter(b => b.estado === "aceptada")
       .sort((a, b) => {
@@ -160,12 +103,12 @@ const VistaAgenda = () => {
       });
   }, [bookings]);
 
-  if (!isAuthenticated || user?.tipo !== 'trabajador') {
+  if (!isAuthenticated || user?.tipo !== 'empleador') {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Card className="max-w-md">
           <CardContent className="pt-6 text-center">
-            <p className="text-muted-foreground">Solo los trabajadores pueden acceder a esta página</p>
+            <p className="text-muted-foreground">Solo los empleadores pueden acceder a esta página</p>
           </CardContent>
         </Card>
       </div>
@@ -189,7 +132,7 @@ const VistaAgenda = () => {
 
       {/* Sección de Solicitudes Pendientes */}
       <div>
-        <h2 className="text-2xl font-bold mb-4">Solicitudes</h2>
+        <h2 className="text-2xl font-bold mb-4">Solicitudes Pendientes</h2>
         {pendingRequests.length === 0 ? (
           <Card>
             <CardContent className="pt-6 text-center">
@@ -199,14 +142,14 @@ const VistaAgenda = () => {
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {pendingRequests.map((solicitud) => {
-              const employer = employers[solicitud.empleadorId];
-              const initials = employer 
-                ? `${employer.nombre.charAt(0)}${employer.apellido.charAt(0)}`.toUpperCase()
+              const worker = workers[solicitud.trabajadorId];
+              const initials = worker 
+                ? `${worker.nombre.charAt(0)}${worker.apellido.charAt(0)}`.toUpperCase()
                 : "??";
               
               // Log para depuración
-              if (!employer && solicitud.empleadorId) {
-                console.warn(`Empleador no encontrado para solicitud ${solicitud.id}. EmpleadorId: ${solicitud.empleadorId}`);
+              if (!worker && solicitud.trabajadorId) {
+                console.warn(`Trabajador no encontrado para solicitud ${solicitud.id}. TrabajadorId: ${solicitud.trabajadorId}`);
               }
               
               return (
@@ -214,16 +157,16 @@ const VistaAgenda = () => {
                   <CardHeader>
                     <div className="flex items-center gap-3 mb-4">
                       <Avatar className="h-12 w-12">
-                        <AvatarImage src={employer?.foto} alt={employer ? `${employer.nombre} ${employer.apellido}` : "Empleador"} />
+                        <AvatarImage src={worker?.foto} alt={worker ? `${worker.nombre} ${worker.apellido}` : "Trabajador"} />
                         <AvatarFallback>{initials}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <CardTitle className="text-lg">
-                          {employer ? `${employer.nombre} ${employer.apellido}` : "Empleador"}
+                          {worker ? `${worker.nombre} ${worker.apellido}` : "Trabajador"}
                         </CardTitle>
                         <CardDescription className="flex items-center gap-1 mt-1">
                           <MapPin className="h-3 w-3" />
-                          {employer?.zona || "Sin ubicación"}
+                          {worker?.zona || "Sin ubicación"}
                         </CardDescription>
                       </div>
                     </div>
@@ -231,14 +174,14 @@ const VistaAgenda = () => {
                       <Badge variant="outline" className="w-fit">
                         {solicitud.estado}
                       </Badge>
-                      {solicitud.empleadorId && (
+                      {solicitud.trabajadorId && (
                         <Button
                           asChild
                           variant="ghost"
                           size="sm"
                           className="h-8"
                         >
-                          <Link to={`/employer/${solicitud.empleadorId}`}>
+                          <Link to={`/worker/${solicitud.trabajadorId}`}>
                             <ExternalLink className="h-3 w-3 mr-1" />
                             Ver perfil
                           </Link>
@@ -271,27 +214,6 @@ const VistaAgenda = () => {
                         </p>
                       </div>
                     )}
-                    <div className="flex gap-2 pt-2">
-                      <Button
-                        onClick={() => handleAccept(solicitud.id)}
-                        disabled={updating === solicitud.id}
-                        className="flex-1"
-                        size="sm"
-                      >
-                        <CheckCircle2 className="h-4 w-4 mr-2" />
-                        {updating === solicitud.id ? "Aceptando..." : "Aceptar"}
-                      </Button>
-                      <Button
-                        onClick={() => handleReject(solicitud.id)}
-                        disabled={updating === solicitud.id}
-                        variant="destructive"
-                        className="flex-1"
-                        size="sm"
-                      >
-                        <XCircle className="h-4 w-4 mr-2" />
-                        {updating === solicitud.id ? "Rechazando..." : "Rechazar"}
-                      </Button>
-                    </div>
                   </CardContent>
                 </Card>
               );
@@ -300,26 +222,26 @@ const VistaAgenda = () => {
         )}
       </div>
 
-      {/* Sección de Solicitudes Aceptadas */}
+      {/* Sección de Solicitudes Confirmadas */}
       <div>
-        <h2 className="text-2xl font-bold mb-4">Próximas Visitas</h2>
-        {acceptedRequests.length === 0 ? (
+        <h2 className="text-2xl font-bold mb-4">Reservas Confirmadas</h2>
+        {confirmedRequests.length === 0 ? (
           <Card>
             <CardContent className="pt-6 text-center">
-              <p className="text-muted-foreground">No tienes visitas programadas</p>
+              <p className="text-muted-foreground">No tienes reservas confirmadas</p>
             </CardContent>
           </Card>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {acceptedRequests.map((reserva) => {
-              const employer = employers[reserva.empleadorId];
-              const initials = employer 
-                ? `${employer.nombre.charAt(0)}${employer.apellido.charAt(0)}`.toUpperCase()
+            {confirmedRequests.map((reserva) => {
+              const worker = workers[reserva.trabajadorId];
+              const initials = worker 
+                ? `${worker.nombre.charAt(0)}${worker.apellido.charAt(0)}`.toUpperCase()
                 : "??";
               
               // Log para depuración
-              if (!employer && reserva.empleadorId) {
-                console.warn(`Empleador no encontrado para reserva ${reserva.id}. EmpleadorId: ${reserva.empleadorId}`);
+              if (!worker && reserva.trabajadorId) {
+                console.warn(`Trabajador no encontrado para reserva ${reserva.id}. TrabajadorId: ${reserva.trabajadorId}`);
               }
               
               const reservaDate = new Date(`${reserva.fecha}T${reserva.horaInicio}`);
@@ -336,23 +258,23 @@ const VistaAgenda = () => {
                   <CardHeader>
                     <div className="flex items-center gap-3 mb-4">
                       <Avatar className="h-12 w-12">
-                        <AvatarImage src={employer?.foto} alt={employer ? `${employer.nombre} ${employer.apellido}` : "Empleador"} />
+                        <AvatarImage src={worker?.foto} alt={worker ? `${worker.nombre} ${worker.apellido}` : "Trabajador"} />
                         <AvatarFallback>{initials}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <CardTitle className="text-lg">
-                          {employer ? `${employer.nombre} ${employer.apellido}` : "Empleador"}
+                          {worker ? `${worker.nombre} ${worker.apellido}` : "Trabajador"}
                         </CardTitle>
                         <CardDescription className="flex items-center gap-1 mt-1">
                           <MapPin className="h-3 w-3" />
-                          {employer?.zona || "Sin ubicación"}
+                          {worker?.zona || "Sin ubicación"}
                         </CardDescription>
                       </div>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Badge variant="default" className="w-fit">
-                          Aceptada
+                          Confirmada
                         </Badge>
                         {isToday && (
                           <Badge variant="secondary" className="w-fit">
@@ -365,14 +287,14 @@ const VistaAgenda = () => {
                           </Badge>
                         )}
                       </div>
-                      {reserva.empleadorId && (
+                      {reserva.trabajadorId && (
                         <Button
                           asChild
                           variant="ghost"
                           size="sm"
                           className="h-8"
                         >
-                          <Link to={`/employer/${reserva.empleadorId}`}>
+                          <Link to={`/worker/${reserva.trabajadorId}`}>
                             <ExternalLink className="h-3 w-3 mr-1" />
                             Ver perfil
                           </Link>
@@ -416,13 +338,13 @@ const VistaAgenda = () => {
   );
 };
 
-const Agenda = () => {
+const AgendaEmployer = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
       <main>
         <div className="container mx-auto px-4 py-8">
-          <VistaAgenda />
+          <VistaAgendaEmployer />
         </div>
       </main>
       <Footer />
@@ -430,4 +352,5 @@ const Agenda = () => {
   );
 };
 
-export default Agenda;
+export default AgendaEmployer;
+

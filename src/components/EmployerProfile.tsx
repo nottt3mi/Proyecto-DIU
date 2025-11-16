@@ -33,24 +33,26 @@ const EmployerProfile = () => {
 
   return (
     <div className="flex items-center gap-4">
-    <button  onClick={handleEditProfile}>
-      {/* Avatar y nombre */}
-      <div className="flex items-center gap-3">
-        <Avatar className="h-10 w-10">
-          <AvatarImage src={user.foto} alt={`${user.nombre} ${user.apellido}`} />
-          <AvatarFallback>{initials}</AvatarFallback>
-        </Avatar>
-        <div className="hidden md:block">
-          <p className="font-medium text-sm">{user.nombre} {user.apellido}</p>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <MapPin className="h-3 w-3" />
-            {user.zona}
+      <Button className="mr-4" variant="secondary" asChild>
+        <Link to="/reservas/employer">Agenda</Link>
+      </Button>
+      <button onClick={handleEditProfile}>
+        {/* Avatar y nombre */}
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={user.foto} alt={`${user.nombre} ${user.apellido}`} />
+            <AvatarFallback>{initials}</AvatarFallback>
+          </Avatar>
+          <div className="hidden md:block">
+            <p className="font-medium text-sm">{user.nombre} {user.apellido}</p>
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <MapPin className="h-3 w-3" />
+              {user.zona}
+            </div>
           </div>
         </div>
-      </div>
-
-    </button>
-    {/* Botones de acción */}
+      </button>
+      {/* Botones de acción */}
       <div className="flex items-center gap-2">
         <Button
           variant="ghost"

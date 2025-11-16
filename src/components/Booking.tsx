@@ -9,9 +9,11 @@ import { db } from "@/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Booking = () => {
   const { id } = useParams(); // ID del trabajador
+  const { user } = useAuth(); // Usuario actual (empleador)
   const [formData, setFormData] = useState({
     fecha: "",
     horaInicio: "",
@@ -42,8 +44,19 @@ const Booking = () => {
     setIsLoading(true);
 
     try {
-      await addDoc(collection(db, "bookings"), {
+      if (!user || !user.id) {
+        toast({
+          title: "Error",
+          description: "Debes estar autenticado para agendar una visita",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      const bookingData = {
         trabajadorId: id,
+        empleadorId: user.id,
         fecha: formData.fecha,
         horaInicio: formData.horaInicio,
         horaFin: formData.horaFin,
@@ -51,7 +64,10 @@ const Booking = () => {
         infoAdicional: formData.infoAdicional,
         creadoEn: serverTimestamp(),
         estado: formData.estado
-      });
+      };
+      
+      console.log("Creando reserva con datos:", bookingData);
+      await addDoc(collection(db, "bookings"), bookingData);
 
       toast({ title: "Agendado", description: "La visita ha sido registrada" });
       setFormData({ fecha: "", horaInicio: "", horaFin: "", direccion: "", infoAdicional: "" , estado: "pendiente de aceptación"});

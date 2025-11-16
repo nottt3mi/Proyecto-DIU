@@ -16,10 +16,12 @@ import WorkerProfilePageView from "./pages/WorkerProfilePageView";
 import { AuthProvider } from "./contexts/AuthContext";
 import ServicesExplore from "./components/ServicesExplore";
 import WorkerPublicProfileView from "./pages/WorkerPublicProfileView";
+import EmployerPublicProfileView from "./pages/EmployerPublicProfileView";
 import SelectService from "./pages/SelectService";
 import BookingPage from "./components/Booking";
 const queryClient = new QueryClient();
 import Reservas from "./pages/Reservas";
+import ReservasEmployer from "./pages/ReservasEmployer";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -33,6 +35,7 @@ const App = () => (
             <Route path="/services" element={<SelectService />} />
             <Route path="/booking/:id" element={<BookingPage />} />
             <Route path="/worker/:id" element={<WorkerPublicProfileView />} />
+            <Route path="/employer/:id" element={<EmployerPublicProfileView />} />
             <Route path="/register" element={<RegisterType />} />
             <Route path="/register/employer" element={<RegisterEmployer />} />
             <Route path="/register/worker" element={<RegisterWorker />} />
@@ -42,6 +45,7 @@ const App = () => (
             <Route path="/profile/employer" element={<EmployerProfilePage />} />
             <Route path="/profile/worker" element={<WorkerProfilePageView />} />
             <Route path="/reservas" element={<Reservas />} />
+            <Route path="/reservas/employer" element={<ReservasEmployer />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
